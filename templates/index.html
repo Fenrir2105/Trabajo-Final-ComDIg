@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador OFDM de 4 Usuarios - Universidad de Cuenca</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <div class="brand-text">
+                    <h1>OFDM Sim 4U</h1>
+                    <span>U. de Cuenca</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fa-solid fa-sliders"></i> Parámetros de Simulación</h3>
+                
+                <!-- Usuario 1 -->
+                <div class="control-group">
+                    <label for="mod_user1">Modulación Usuario 1 (Subc. 0-15)</label>
+                    <div class="select-wrapper">
+                        <select id="mod_user1">
+                            <option value="BPSK" selected>BPSK (1 bit/símb)</option>
+                            <option value="QPSK">QPSK (2 bits/símb)</option>
+                            <option value="16-QAM">16-QAM (4 bits/símb)</option>
+                            <option value="64-QAM">64-QAM (6 bits/símb)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Usuario 2 -->
+                <div class="control-group">
+                    <label for="mod_user2">Modulación Usuario 2 (Subc. 16-31)</label>
+                    <div class="select-wrapper">
+                        <select id="mod_user2">
+                            <option value="BPSK">BPSK (1 bit/símb)</option>
+                            <option value="QPSK" selected>QPSK (2 bits/símb)</option>
+                            <option value="16-QAM">16-QAM (4 bits/símb)</option>
+                            <option value="64-QAM">64-QAM (6 bits/símb)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Usuario 3 -->
+                <div class="control-group">
+                    <label for="mod_user3">Modulación Usuario 3 (Subc. 32-47)</label>
+                    <div class="select-wrapper">
+                        <select id="mod_user3">
+                            <option value="BPSK">BPSK (1 bit/símb)</option>
+                            <option value="QPSK">QPSK (2 bits/símb)</option>
+                            <option value="16-QAM" selected>16-QAM (4 bits/símb)</option>
+                            <option value="64-QAM">64-QAM (6 bits/símb)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Usuario 4 -->
+                <div class="control-group">
+                    <label for="mod_user4">Modulación Usuario 4 (Subc. 48-63)</label>
+                    <div class="select-wrapper">
+                        <select id="mod_user4">
+                            <option value="BPSK">BPSK (1 bit/símb)</option>
+                            <option value="QPSK">QPSK (2 bits/símb)</option>
+                            <option value="16-QAM">16-QAM (4 bits/símb)</option>
+                            <option value="64-QAM" selected>64-QAM (6 bits/símb)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Canal SNR -->
+                <div class="control-group">
+                    <div class="slider-header">
+                        <label for="snr_db">SNR del Canal (dB)</label>
+                        <span id="snr_val">20 dB</span>
+                    </div>
+                    <input type="range" id="snr_db" min="-5" max="40" step="1" value="20">
+                </div>
+                
+                <!-- Atenuación -->
+                <div class="control-group">
+                    <div class="slider-header">
+                        <label for="attenuation">Atenuación del Canal (α)</label>
+                        <span id="att_val">1.00</span>
+                    </div>
+                    <input type="range" id="attenuation" min="0.05" max="1.0" step="0.05" value="1.0">
+                </div>
+
+                <!-- Selección de Audio -->
+                <div class="control-group">
+                    <label for="audio_input"><i class="fa-solid fa-music"></i> Cargar Audio (.wav)</label>
+                    <input type="file" id="audio_input" accept="audio/wav" class="file-input">
+                    <span class="file-help">Solo archivos .wav de pocos segundos.</span>
+                </div>
+                
+                <!-- Botón Simular -->
+                <button id="run_sim" class="btn-primary">
+                    <i class="fa-solid fa-circle-nodes"></i> Ejecutar Simulación
+                </button>
+            </div>
+            
+            <div class="sidebar-footer">
+                <p>Comunicaciones Digitales</p>
+                <p>U. de Cuenca - Trabajo 2</p>
+            </div>
+        </aside>
+
+        <!-- Main Display Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-title">
+                    <h2>Simulación OFDM Multi-usuario y Audio sobre Canal Ruidoso</h2>
+                    <p>64 Subportadoras distribuidas equitativamente (16 c/u) entre 4 usuarios con modulación seleccionable</p>
+                </div>
+                <div class="university-logo">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Ing. Telecomunicaciones</span>
+                </div>
+            </header>
+            
+            <!-- Metric Overview Cards -->
+            <section class="metrics-grid">
+                <!-- Card User 1 -->
+                <div class="metric-card user1-card">
+                    <div class="metric-icon"><i class="fa-solid fa-circle-user" style="color: #ff3838;"></i></div>
+                    <div class="metric-info">
+                        <h4>BER Usuario 1</h4>
+                        <p id="ber_u1_val" class="metric-value">0.00000</p>
+                        <span id="mod_u1_badge" class="badge bg-cyan">BPSK</span>
+                    </div>
+                </div>
+                
+                <!-- Card User 2 -->
+                <div class="metric-card user2-card">
+                    <div class="metric-icon"><i class="fa-solid fa-circle-user" style="color: #2e86de;"></i></div>
+                    <div class="metric-info">
+                        <h4>BER Usuario 2</h4>
+                        <p id="ber_u2_val" class="metric-value">0.00000</p>
+                        <span id="mod_u2_badge" class="badge bg-green">QPSK</span>
+                    </div>
+                </div>
+
+                <!-- Card User 3 -->
+                <div class="metric-card user3-card">
+                    <div class="metric-icon"><i class="fa-solid fa-circle-user" style="color: #2ecc71;"></i></div>
+                    <div class="metric-info">
+                        <h4>BER Usuario 3</h4>
+                        <p id="ber_u3_val" class="metric-value">0.00000</p>
+                        <span id="mod_u3_badge" class="badge bg-purple">16-QAM</span>
+                    </div>
+                </div>
+
+                <!-- Card User 4 -->
+                <div class="metric-card user4-card">
+                    <div class="metric-icon"><i class="fa-solid fa-circle-user" style="color: #9b59b6;"></i></div>
+                    <div class="metric-info">
+                        <h4>BER Usuario 4</h4>
+                        <p id="ber_u4_val" class="metric-value">0.00000</p>
+                        <span id="mod_u4_badge" class="badge bg-orange">64-QAM</span>
+                    </div>
+                </div>
+                
+                <!-- Card Canal -->
+                <div class="metric-card channel-card">
+                    <div class="metric-icon"><i class="fa-solid fa-tower-broadcast" style="color: #ff007f;"></i></div>
+                    <div class="metric-info">
+                        <h4>Estado Canal</h4>
+                        <p id="channel_status" class="metric-value-sm" style="margin:2px 0;">AWGN + Atenuación</p>
+                        <span id="snr_badge" class="badge bg-pink">SNR: 20 dB</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Audio Transmission Card -->
+            <section class="audio-transmission-section">
+                <div class="plot-card double-width">
+                    <div class="plot-header">
+                        <h3><i class="fa-solid fa-volume-high"></i> Transmisión Simultánea de Audio (Comparativa)</h3>
+                        <span class="plot-desc">Todos los usuarios transmiten el audio completo de manera simultánea en sus respectivas bandas de frecuencia. Aquí puedes reproducir y comparar el resultado de cada usuario.</span>
+                    </div>
+                    <div class="audio-players-container">
+                        <!-- Left Panel: Original Audio -->
+                        <div class="audio-player-box original-box">
+                            <h5>Audio Original</h5>
+                            <audio id="audio_original" controls class="custom-audio-player"></audio>
+                            <div class="original-desc">
+                                <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 8px; line-height: 1.4;">
+                                    <i class="fa-solid fa-circle-info" style="color: var(--color-cyan);"></i> 
+                                    Este arpegio (Do-Mi-Sol-Do) o el archivo .wav cargado es transmitido simultáneamente por los 4 usuarios.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Multi-user Received Audios -->
+                        <div class="audio-grid-received">
+                            <div class="audio-player-box u1-audio-box">
+                                <h5><span class="dot u1-dot"></span> U1 - Canal Rojo (<span id="exp_u1">BPSK</span>)</h5>
+                                <audio id="audio_received_u1" controls class="custom-audio-player"></audio>
+                            </div>
+                            <div class="audio-player-box u2-audio-box">
+                                <h5><span class="dot u2-dot"></span> U2 - Canal Azul (<span id="exp_u2">QPSK</span>)</h5>
+                                <audio id="audio_received_u2" controls class="custom-audio-player"></audio>
+                            </div>
+                            <div class="audio-player-box u3-audio-box">
+                                <h5><span class="dot u3-dot"></span> U3 - Canal Verde (<span id="exp_u3">16-QAM</span>)</h5>
+                                <audio id="audio_received_u3" controls class="custom-audio-player"></audio>
+                            </div>
+                            <div class="audio-player-box u4-audio-box">
+                                <h5><span class="dot u4-dot"></span> U4 - Canal Morado (<span id="exp_u4">64-QAM</span>)</h5>
+                                <audio id="audio_received_u4" controls class="custom-audio-player"></audio>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Main Grid of Plots -->
+            <section class="plots-grid">
+                <!-- Card 1: Constelación -->
+                <div class="plot-card double-width">
+                    <div class="plot-header">
+                        <h3><i class="fa-solid fa-border-all"></i> Diagramas de Constelación de los 4 Usuarios</h3>
+                        <span class="plot-desc">Señales IQ recibidas (ecualizadas) en los 4 canales espectrales de 16 subportadoras</span>
+                    </div>
+                    <div class="plot-body">
+                        <div class="plot-placeholder" id="plot_constellation_container">
+                            <img id="img_constellation" src="" alt="Constelaciones IQ">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 2: Espectro -->
+                <div class="plot-card">
+                    <div class="plot-header">
+                        <h3><i class="fa-solid fa-wave-square"></i> PSD en RF (Espectro Combinado)</h3>
+                        <span class="plot-desc">Densidad espectral combinada mostrando la banda frecuencial asignada a cada usuario</span>
+                    </div>
+                    <div class="plot-body">
+                        <div class="plot-placeholder" id="plot_spectrum_container">
+                            <img id="img_spectrum" src="" alt="Espectro PSD">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card 3: Dominio del Tiempo -->
+                <div class="plot-card">
+                    <div class="plot-header">
+                        <h3><i class="fa-solid fa-chart-line"></i> Señal en el Tiempo (Primer Símbolo Combinado)</h3>
+                        <span class="plot-desc">Forma de onda en RF combinada con prefijo cíclico (CP) resaltado</span>
+                    </div>
+                    <div class="plot-body">
+                        <div class="plot-placeholder" id="plot_time_domain_container">
+                            <img id="img_time_domain" src="" alt="Señal en el Tiempo">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Spinner Loader Overlay -->
+    <div id="loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+        <p>Procesando Imagen y Simulando Canal OFDM...</p>
+    </div>
+
+    <!-- Local Script -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
