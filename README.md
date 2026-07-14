@@ -23,11 +23,19 @@ El simulador cuenta con una interfaz web desarrollada en Flask que permite trans
 
 ## Estructura de Archivos
 
-* app.py: Servidor web Flask. Maneja las rutas HTTP, la conversión de audio a bits (y viceversa), el empaquetado en base64 y la comunicación con el núcleo de simulación.
-* ofdm_simulation.py: Núcleo matemático de la simulación OFDM. Contiene el mapeo/desmapeo QAM, las operaciones IFFT/FFT, la inserción del prefijo cíclico, el canal AWGN, el filtrado y la generación de gráficas con Matplotlib.
+* app.py: Servidor web principal en Flask. Maneja las rutas HTTP, la conversión de audio a bits (y viceversa), el empaquetado en base64 y la comunicación con el núcleo de simulación.
+* ofdm_simulation.py: Núcleo matemático de la simulación OFDM. Contiene el mapeo/desmapeo QAM, las operaciones IFFT/FFT, la inserción del prefijo cíclico, el canal AWGN y el filtrado.
 * requirements.txt: Lista de dependencias de Python necesarias para ejecutar el proyecto.
-* test_ofdm.py: Script de prueba unitaria para validar la lógica del núcleo OFDM enviando secuencias de bits aleatorios.
-* test_app_logic.py: Script de prueba que valida la conversión del flujo de audio a bits y su correcta reconstrucción sin levantar el servidor web.
+* test_ofdm.py / test_app_logic.py: Scripts de pruebas para validar la lógica matemática y de audio sin necesidad de levantar el servidor web.
+
+Carpetas del Sistema Web:
+* templates/
+  * index.html: Archivo de estructura HTML que define la interfaz gráfica de usuario servida por Flask.
+* static/
+  * style.css: Hoja de estilos que proporciona el diseño visual moderno (modo oscuro) a la interfaz.
+  * script.js: Lógica del lado del cliente (Frontend) encargada de la interactividad, recolección de parámetros, envío de peticiones asíncronas al servidor y actualización de gráficas y audios.
+* __pycache__/
+  * app.cpython-311.pyc / ofdm_simulation.cpython-311.pyc: Archivos binarios compilados automáticamente por Python para mejorar los tiempos de carga de ejecución.
 
 ---
 
@@ -37,8 +45,8 @@ Asegúrate de tener Python 3 instalado en tu sistema. Se recomienda el uso de un
 
 ## Instalación
 
-1. Clona o descarga este repositorio en tu máquina local.
-2. Abre una terminal y navega hasta el directorio del proyecto.
+1. Clona o descarga este repositorio en tu máquina local asegurándote de mantener la estructura de carpetas (static/ y templates/).
+2. Abre una terminal y navega hasta el directorio raíz del proyecto.
 3. Instala las dependencias necesarias ejecutando el siguiente comando:
 
 pip install -r requirements.txt
