@@ -1,6 +1,6 @@
 # Trabajo 2: Implementación Discreta de Modulación Multiportadora (OFDM)
 
-Autor: Diego Fernando Portilla Loja  
+Autores: Mateo Francisco Chimbo Quezada, Juan Jose Duran Chica, Diego Fernando Portilla Loja, Cristopher Dario Remache Peñaloza  
 Institución: Universidad de Cuenca - Carrera de Ingeniería en Telecomunicaciones  
 Asignatura: Comunicaciones Digitales  
 
